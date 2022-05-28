@@ -56,5 +56,5 @@
 {!! $data->render() !!}
 
 
-<p class="text-center text-primary"><small>Tutorial by ItSolutionStuff.com</small></p>
+<p class="text-center text-primary"><small>See Github for Collective References</small></p>
 @endsection
