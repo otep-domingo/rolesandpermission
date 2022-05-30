@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class ProductController extends Controller
 {
@@ -26,6 +27,7 @@ class ProductController extends Controller
     public function index()
     {
         $products = Product::latest()->paginate(5);
+        Log::notice('Session: ',session()->all());
         return view('products.index',compact('products'))
             ->with('i', (request()->input('page', 1) - 1) * 5);
     }
@@ -52,7 +54,7 @@ class ProductController extends Controller
             'name' => 'required',
             'detail' => 'required',
         ]);
-    
+        Log::notice('New record: ',$request);
         Product::create($request->all());
     
         return redirect()->route('products.index')
@@ -78,6 +80,7 @@ class ProductController extends Controller
      */
     public function edit(Product $product)
     {
+        
         return view('products.edit',compact('product'));
     }
     
@@ -96,7 +99,8 @@ class ProductController extends Controller
         ]);
     
         $product->update($request->all());
-    
+        
+        Log::warning('Record: ',['request'=>$request,'product'=>$product]);
         return redirect()->route('products.index')
                         ->with('success','Product updated successfully');
     }
@@ -110,7 +114,7 @@ class ProductController extends Controller
     public function destroy(Product $product)
     {
         $product->delete();
-    
+        Log::warning('Record: ',$product,'Deleted by: ',session()->all());
         return redirect()->route('products.index')
                         ->with('success','Product deleted successfully');
     }
