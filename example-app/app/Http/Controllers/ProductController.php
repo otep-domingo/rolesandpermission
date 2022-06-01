@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-
+use Illuminate\Validation\Validator;
 class ProductController extends Controller
 {
   /**
@@ -53,9 +53,27 @@ class ProductController extends Controller
         request()->validate([
             'name' => 'required',
             'detail' => 'required',
+            'image'=>'required|image|mimes:jpeg,png,jpg,gif,svg|max:100',
+        ],
+        [
+            'image.image'=>"Please input a valid image file.",
+            'image.max'=>"You reached the limit of image which is 100KB.",
+
         ]);
-        Log::notice('New record: ',$request);
-        Product::create($request->all());
+        
+        $input=$request->all();
+
+        if($image=$request->file('image')){
+            $destinationPath='image/';
+            $profileImage=date('YmdHis').".".$image->getClientOriginalExtension();
+            $image->move($destinationPath,$profileImage);
+            $input['image']="$profileImage";
+        }else{
+            Log::error("Error in the image");
+        }
+
+        //Product::create($request->all());
+        Product::create($input);
     
         return redirect()->route('products.index')
                         ->with('success','Product created successfully.');
@@ -93,12 +111,29 @@ class ProductController extends Controller
      */
     public function update(Request $request, Product $product)
     {
-         request()->validate([
+        request()->validate([
             'name' => 'required',
             'detail' => 'required',
+            'image'=>'required|image|mimes:jpeg,png,jpg,gif,svg|max:100',
+        ],
+        [
+            'image.image'=>"Please input a valid image file.",
+            'image.max'=>"You reached the limit of image which is 100KB.",
+
         ]);
+        
+        $input=$request->all();
+
+        if($image=$request->file('image')){
+            $destinationPath='image/';
+            $profileImage=date('YmdHis').".".$image->getClientOriginalExtension();
+            $image->move($destinationPath,$profileImage);
+            $input['image']="$profileImage";
+        }else{
+            Log::error("Error in the image");
+        }
     
-        $product->update($request->all());
+        $product->update($input);
         
         Log::warning('Record: ',['request'=>$request,'product'=>$product]);
         return redirect()->route('products.index')
